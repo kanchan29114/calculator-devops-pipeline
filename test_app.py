@@ -66,3 +66,18 @@ def test_modulo_zero(client):
     assert response.status_code == 400
     assert 'error' in data
     assert data['error'] == "Modulo by zero is not allowed."
+
+
+def test_power(client):
+    response = client.get('/power?a=2&b=3')
+    data = response.get_json()
+    assert response.status_code == 200
+    assert data['result'] == 8.0
+
+
+def test_power_zero_base_negative_exp(client):
+    response = client.get('/power?a=0&b=-1')
+    data = response.get_json()
+    assert response.status_code == 400
+    assert 'error' in data
+    assert "Result is undefined" in data['error']

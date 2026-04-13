@@ -62,5 +62,16 @@ def modulo():
     return jsonify({"result": a % b})
 
 
+@app.route('/power')
+def power():
+    a, b, error = get_args()
+    if error:
+        return jsonify({"error": error}), 400
+    try:
+        return jsonify({"result": a ** b})
+    except ZeroDivisionError:
+        return jsonify({"error": "Result is undefined (e.g., 0 raised to a negative power)."}), 400
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
