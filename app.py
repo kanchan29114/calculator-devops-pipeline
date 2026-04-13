@@ -1,10 +1,10 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 
 app = Flask(__name__)
 
 @app.route('/')
 def hello():
-    return "Welcome to Calculator DevOps App"
+    return render_template('index.html')
 
 def get_args():
     try:
