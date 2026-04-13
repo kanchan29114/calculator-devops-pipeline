@@ -44,3 +44,17 @@ def test_invalid_input(client):
     assert response.status_code == 400
     assert 'error' in data
     assert "Invalid input" in data['error']
+ 
+def test_modulo(client):
+    response = client.get('/modulo?a=10&b=3')
+    data = response.get_json()
+    assert response.status_code == 200
+    assert data['result'] == 1.0
+
+def test_modulo_zero(client):
+    response = client.get('/modulo?a=10&b=0')
+    data = response.get_json()
+    assert response.status_code == 400
+    assert 'error' in data
+    assert data['error'] == "Modulo by zero is not allowed."
+
