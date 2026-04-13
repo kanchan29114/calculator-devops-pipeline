@@ -145,8 +145,18 @@
         .clear {
             color: var(--danger);
             background: rgba(239, 68, 68, 0.1);
-            grid-column: span 2;
-            aspect-ratio: auto;
+            aspect-ratio: 1;
+        }
+
+        .backspace {
+            color: var(--accent);
+            background: rgba(16, 185, 129, 0.1);
+            aspect-ratio: 1;
+        }
+
+        .backspace:hover {
+            background: var(--accent);
+            color: white;
         }
 
         .clear:hover {
@@ -184,7 +194,8 @@
             <div id="current-val">0</div>
         </div>
         <div class="buttons">
-            <button class="clear" onclick="clearDisplay()">CLEAR</button>
+            <button class="clear" onclick="clearDisplay()">C</button>
+            <button class="backspace" onclick="backspace()">⌫</button>
             <button class="operator" onclick="setOperator('divide')">/</button>
             <button class="operator" onclick="setOperator('multiply')">×</button>
             
@@ -247,6 +258,15 @@
             operator = op;
             previousInput = currentInput;
             currentInput = '0';
+            updateDisplay();
+        }
+
+        function backspace() {
+            if (currentInput.length > 1) {
+                currentInput = currentInput.slice(0, -1);
+            } else {
+                currentInput = '0';
+            }
             updateDisplay();
         }
 
