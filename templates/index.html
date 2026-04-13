@@ -132,8 +132,6 @@
 
         .equals {
             background: var(--primary);
-            grid-column: span 2;
-            aspect-ratio: auto;
             border-radius: 1rem;
         }
 
@@ -216,6 +214,7 @@
             
             <button onclick="appendNumber('0')">0</button>
             <button onclick="appendNumber('.')">.</button>
+            <button class="operator" onclick="setOperator('power')">^</button>
             <button class="equals" onclick="calculate()">=</button>
         </div>
     </div>
@@ -238,7 +237,8 @@
                 subtract: '-',
                 multiply: '×',
                 divide: '/',
-                modulo: '%'
+                modulo: '%',
+                power: '^'
             }[operator] || '';
             previousDisplay.innerText = previousInput ? `${previousInput} ${opSymbol}` : '';
         }
