@@ -196,26 +196,27 @@
         <div class="buttons">
             <button class="clear" onclick="clearDisplay()">C</button>
             <button class="backspace" onclick="backspace()">⌫</button>
+            <button class="operator" onclick="setOperator('modulo')">%</button>
             <button class="operator" onclick="setOperator('divide')">/</button>
-            <button class="operator" onclick="setOperator('multiply')">×</button>
             
             <button onclick="appendNumber('7')">7</button>
             <button onclick="appendNumber('8')">8</button>
             <button onclick="appendNumber('9')">9</button>
-            <button class="operator" onclick="setOperator('subtract')">-</button>
+            <button class="operator" onclick="setOperator('multiply')">×</button>
             
             <button onclick="appendNumber('4')">4</button>
             <button onclick="appendNumber('5')">5</button>
             <button onclick="appendNumber('6')">6</button>
-            <button class="operator" onclick="setOperator('add')">+</button>
+            <button class="operator" onclick="setOperator('subtract')">-</button>
             
             <button onclick="appendNumber('1')">1</button>
             <button onclick="appendNumber('2')">2</button>
             <button onclick="appendNumber('3')">3</button>
-            <button class="equals" onclick="calculate()">=</button>
+            <button class="operator" onclick="setOperator('add')">+</button>
             
             <button onclick="appendNumber('0')">0</button>
             <button onclick="appendNumber('.')">.</button>
+            <button class="equals" onclick="calculate()">=</button>
         </div>
     </div>
 
@@ -236,7 +237,8 @@
                 add: '+',
                 subtract: '-',
                 multiply: '×',
-                divide: '/'
+                divide: '/',
+                modulo: '%'
             }[operator] || '';
             previousDisplay.innerText = previousInput ? `${previousInput} ${opSymbol}` : '';
         }
