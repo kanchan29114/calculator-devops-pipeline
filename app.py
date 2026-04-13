@@ -1,5 +1,7 @@
 from flask import Flask, request, jsonify, render_template
 
+x=1
+
 app = Flask(__name__)
 
 
