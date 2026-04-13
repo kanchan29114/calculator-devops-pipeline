@@ -2,9 +2,11 @@ from flask import Flask, request, jsonify, render_template
 
 app = Flask(__name__)
 
+
 @app.route('/')
 def hello():
     return render_template('index.html')
+
 
 def get_args():
     try:
@@ -12,7 +14,9 @@ def get_args():
         b = float(request.args.get('b'))
         return a, b, None
     except (TypeError, ValueError):
-        return None, None, "Invalid input. Please provide numbers for 'a' and 'b'."
+        return (None, None,
+                "Invalid input. Please provide numbers for 'a' and 'b'.")
+
 
 @app.route('/add')
 def add():
@@ -21,6 +25,7 @@ def add():
         return jsonify({"error": error}), 400
     return jsonify({"result": a + b})
 
+
 @app.route('/subtract')
 def subtract():
     a, b, error = get_args()
@@ -28,12 +33,14 @@ def subtract():
         return jsonify({"error": error}), 400
     return jsonify({"result": a - b})
 
+
 @app.route('/multiply')
 def multiply():
     a, b, error = get_args()
     if error:
         return jsonify({"error": error}), 400
     return jsonify({"result": a * b})
+
 
 @app.route('/divide')
 def divide():
