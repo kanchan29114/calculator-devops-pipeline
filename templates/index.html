@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevOps Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --primary: #3b82f6;
+            --accent: #10b981;
+            --danger: #ef4444;
+            --text: #f8fafc;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-gradient);
+            color: var(--text);
+            overflow: hidden;
+        }
+
+        .calculator {
+            width: 380px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 2rem;
+            padding: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary);
+            letter-spacing: 0.1rem;
+            text-transform: uppercase;
+        }
+
+        .display {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: right;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            border: 1px solid var(--glass-border);
+        }
+
+        #previous-val {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 0.5rem;
+            min-height: 1.4em;
+        }
+
+        #current-val {
+            font-size: 2.5rem;
+            font-weight: 600;
+            word-break: break-all;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+
+        button {
+            aspect-ratio: 1;
+            border: none;
+            border-radius: 1rem;
+            font-size: 1.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid transparent;
+        }
+
+        button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.05);
+            border-color: var(--glass-border);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        .operator {
+            color: var(--primary);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .operator:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .equals {
+            background: var(--primary);
+            grid-column: span 2;
+            aspect-ratio: auto;
+            border-radius: 1rem;
+        }
+
+        .equals:hover {
+            background: #2563eb;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .clear {
+            color: var(--danger);
+            background: rgba(239, 68, 68, 0.1);
+            grid-column: span 2;
+            aspect-ratio: auto;
+        }
+
+        .clear:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        .error-toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--danger);
+            padding: 1rem 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            display: none;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translate(-50%, 50px); opacity: 0; }
+            to { transform: translate(-50%, 0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="calculator">
+        <div class="header">
+            <h1>Calculator</h1>
+        </div>
+        <div class="display">
+            <div id="previous-val"></div>
+            <div id="current-val">0</div>
+        </div>
+        <div class="buttons">
+            <button class="clear" onclick="clearDisplay()">CLEAR</button>
+            <button class="operator" onclick="setOperator('divide')">/</button>
+            <button class="operator" onclick="setOperator('multiply')">×</button>
+            
+            <button onclick="appendNumber('7')">7</button>
+            <button onclick="appendNumber('8')">8</button>
+            <button onclick="appendNumber('9')">9</button>
+            <button class="operator" onclick="setOperator('subtract')">-</button>
+            
+            <button onclick="appendNumber('4')">4</button>
+            <button onclick="appendNumber('5')">5</button>
+            <button onclick="appendNumber('6')">6</button>
+            <button class="operator" onclick="setOperator('add')">+</button>
+            
+            <button onclick="appendNumber('1')">1</button>
+            <button onclick="appendNumber('2')">2</button>
+            <button onclick="appendNumber('3')">3</button>
+            <button class="equals" onclick="calculate()">=</button>
+            
+            <button onclick="appendNumber('0')">0</button>
+            <button onclick="appendNumber('.')">.</button>
+        </div>
+    </div>
+
+    <div id="error-toast" class="error-toast"></div>
+
+    <script>
+        let currentInput = '0';
+        let previousInput = '';
+        let operator = null;
+
+        const currentDisplay = document.getElementById('current-val');
+        const previousDisplay = document.getElementById('previous-val');
+        const errorToast = document.getElementById('error-toast');
+
+        function updateDisplay() {
+            currentDisplay.innerText = currentInput;
+            const opSymbol = {
+                add: '+',
+                subtract: '-',
+                multiply: '×',
+                divide: '/'
+            }[operator] || '';
+            previousDisplay.innerText = previousInput ? `${previousInput} ${opSymbol}` : '';
+        }
+
+        function appendNumber(num) {
+            if (num === '.' && currentInput.includes('.')) return;
+            if (currentInput === '0' && num !== '.') {
+                currentInput = num;
+            } else {
+                currentInput += num;
+            }
+            updateDisplay();
+        }
+
+        function setOperator(op) {
+            if (operator !== null && currentInput !== '0') {
+                calculate();
+            }
+            operator = op;
+            previousInput = currentInput;
+            currentInput = '0';
+            updateDisplay();
+        }
+
+        function clearDisplay() {
+            currentInput = '0';
+            previousInput = '';
+            operator = null;
+            updateDisplay();
+        }
+
+        function showError(msg) {
+            errorToast.innerText = msg;
+            errorToast.style.display = 'block';
+            setTimeout(() => {
+                errorToast.style.display = 'none';
+            }, 3000);
+        }
+
+        async function calculate() {
+            if (!operator || previousInput === '') return;
+
+            const a = previousInput;
+            const b = currentInput;
+
+            try {
+                const response = await fetch(`/${operator}?a=${a}&b=${b}`);
+                const data = await response.json();
+
+                if (response.ok) {
+                    currentInput = data.result.toString();
+                    operator = null;
+                    previousInput = '';
+                    updateDisplay();
+                } else {
+                    showError(data.error || 'Something went wrong');
+                    clearDisplay();
+                }
+            } catch (err) {
+                showError('Failed to connect to backend server');
+            }
+        }
+    </script>
+</body>
+</html>
