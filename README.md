@@ -22,8 +22,8 @@ This project aims to build a simple calculator application and implement a compl
 - Docker
 - Render (Deployment)
 
-## 📂 Project Status
-Project initialized. Development in progress.
+## ⚙️ Setup Instructions
 
-## 👩‍💻 Team Members
-- Add names here
+1. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
