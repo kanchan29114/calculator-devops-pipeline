@@ -68,11 +68,12 @@
             padding: 1.5rem;
             margin-bottom: 2rem;
             text-align: right;
-            min-height: 100px;
+            min-height: 120px;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
             border: 1px solid var(--glass-border);
+            position: relative;
         }
 
         #previous-val {
@@ -175,9 +176,162 @@
             animation: slideUp 0.3s ease-out;
         }
 
-        @keyframes slideUp {
-            from { transform: translate(-50%, 50px); opacity: 0; }
-            to { transform: translate(-50%, 0); opacity: 1; }
+        .empty-history {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 0.9rem;
+            padding: 1rem;
+        }
+
+        /* Modern Display Enhancements */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .history-toggle {
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            padding: 0.6rem;
+            border-radius: 0.75rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            z-index: 10;
+        }
+
+        .history-toggle:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--primary);
+            transform: scale(1.05);
+        }
+
+        .history-toggle svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .history-panel {
+            position: absolute;
+            top: 3.2rem;
+            left: 1rem;
+            width: 260px;
+            max-height: 380px;
+            background: rgba(15, 23, 42, 0.98);
+            backdrop-filter: blur(30px);
+            z-index: 200;
+            border-radius: 1.25rem;
+            padding: 1.25rem;
+            display: none;
+            flex-direction: column;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
+            animation: popIn 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+        }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.95) translateY(-10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .history-panel.active {
+            display: flex;
+        }
+
+        .history-panel .history-list {
+            max-height: 300px;
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+
+        /* Scrollbar styles for history list */
+        .history-list::-webkit-scrollbar {
+            width: 4px;
+        }
+        .history-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .history-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .history-header h2 {
+            font-size: 1rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.8);
+            margin: 0;
+        }
+
+        .clear-history {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.75rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 0.4rem;
+            transition: all 0.2s;
+            aspect-ratio: auto;
+            min-height: auto;
+            height: auto;
+        }
+
+        .clear-history:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: none;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .expression {
+            font-size: 14px;
+            color: #aaa;
+        }
+
+        .result {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        #current-val {
+            font-size: 2.2rem;
+            transition: all 0.2s;
+        }
+
+        .result-state #current-val {
+            color: var(--accent);
+            font-size: 2.5rem;
         }
     </style>
 </head>
@@ -187,15 +341,31 @@
         <div class="header">
             <h1>Calculator</h1>
         </div>
-        <div class="display">
+        
+        <div id="display-container" class="display">
+            <button id="history-toggle" class="history-toggle" onclick="toggleHistory(event)" title="View History">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            </button>
             <div id="previous-val"></div>
             <div id="current-val">0</div>
+
+            <!-- History Panel Overlay (Floating Popup) -->
+            <div id="history-panel" class="history-panel" onclick="event.stopPropagation()">
+                <div class="history-header">
+                    <h2>History</h2>
+                    <button class="clear-history" onclick="clearHistory()">Clear</button>
+                </div>
+                <div id="history-list" class="history-list">
+                    <div class="empty-history">No history yet</div>
+                </div>
+            </div>
         </div>
+
         <div class="buttons">
             <button class="clear" onclick="clearDisplay()">C</button>
             <button class="backspace" onclick="backspace()">⌫</button>
             <button class="operator" onclick="setOperator('modulo')">%</button>
-            <button class="operator" onclick="setOperator('divide')">/</button>
+            <button class="operator" onclick="setOperator('divide')">÷</button>
             
             <button onclick="appendNumber('7')">7</button>
             <button onclick="appendNumber('8')">8</button>
@@ -217,7 +387,9 @@
             <button class="operator" onclick="setOperator('power')">^</button>
             <button class="equals" onclick="calculate()">=</button>
         </div>
-    </div>
+
+            </div>
+        </div>
 
     <div id="error-toast" class="error-toast"></div>
 
@@ -225,27 +397,49 @@
         let currentInput = '0';
         let previousInput = '';
         let operator = null;
+        let isResultDisplayed = false;
+        let lastFullExpression = '';
+        let history = JSON.parse(localStorage.getItem('calc_history') || '[]');
 
         const currentDisplay = document.getElementById('current-val');
         const previousDisplay = document.getElementById('previous-val');
+        const displayContainer = document.getElementById('display-container');
+        const historyList = document.getElementById('history-list');
+        const historyPanel = document.getElementById('history-panel');
+        const historyToggle = document.getElementById('history-toggle');
         const errorToast = document.getElementById('error-toast');
 
         function updateDisplay() {
-            currentDisplay.innerText = currentInput;
             const opSymbol = {
-                add: '+',
-                subtract: '-',
-                multiply: '×',
-                divide: '/',
-                modulo: '%',
-                power: '^'
+                add: '+', subtract: '-', multiply: '×', divide: '÷', modulo: '%', power: '^'
             }[operator] || '';
-            previousDisplay.innerText = previousInput ? `${previousInput} ${opSymbol}` : '';
+
+            if (isResultDisplayed) {
+                displayContainer.classList.add('result-state');
+                previousDisplay.innerText = lastFullExpression;
+                currentDisplay.innerText = currentInput;
+            } else {
+                displayContainer.classList.remove('result-state');
+                previousDisplay.innerText = '';
+                
+                // Fix Auto-Zero: Don't show currentInput if it's 'pending' (empty)
+                if (operator) {
+                    const displayInput = currentInput === '' ? '' : ` ${currentInput}`;
+                    currentDisplay.innerText = `${previousInput} ${opSymbol}${displayInput}`;
+                } else {
+                    currentDisplay.innerText = currentInput || '0';
+                }
+            }
         }
 
         function appendNumber(num) {
+            if (isResultDisplayed) {
+                currentInput = '';
+                isResultDisplayed = false;
+            }
             if (num === '.' && currentInput.includes('.')) return;
-            if (currentInput === '0' && num !== '.') {
+            
+            if ((currentInput === '0' || currentInput === '') && num !== '.') {
                 currentInput = num;
             } else {
                 currentInput += num;
@@ -254,20 +448,23 @@
         }
 
         function setOperator(op) {
-            if (operator !== null && currentInput !== '0') {
+            if (isResultDisplayed) {
+                isResultDisplayed = false;
+            }
+            if (operator !== null && currentInput !== '' && currentInput !== '0') {
                 calculate();
             }
             operator = op;
-            previousInput = currentInput;
-            currentInput = '0';
+            previousInput = currentInput || previousInput || '0';
+            currentInput = ''; // Set to empty to avoid '0' being shown immediately
             updateDisplay();
         }
 
         function backspace() {
-            if (currentInput.length > 1) {
+            if (currentInput && currentInput.length > 1) {
                 currentInput = currentInput.slice(0, -1);
             } else {
-                currentInput = '0';
+                currentInput = operator ? '' : '0';
             }
             updateDisplay();
         }
@@ -276,8 +473,54 @@
             currentInput = '0';
             previousInput = '';
             operator = null;
+            isResultDisplayed = false;
+            lastFullExpression = '';
+            historyPanel.classList.remove('active');
             updateDisplay();
         }
+
+        // History Functions
+        function toggleHistory(e) {
+            e.stopPropagation();
+            historyPanel.classList.toggle('active');
+        }
+
+        // Close history when clicking outside
+        window.addEventListener('mousedown', function(e) {
+            if (!historyPanel.contains(e.target) && e.target !== historyToggle) {
+                historyPanel.classList.remove('active');
+            }
+        });
+
+        function renderHistory() {
+            if (history.length === 0) {
+                historyList.innerHTML = '<div class="empty-history">No history yet</div>';
+                return;
+            }
+
+            historyList.innerHTML = history.map(item => `
+                <div class="history-item">
+                    <span class="expression">${item.expr} =</span>
+                    <span class="result">${item.res}</span>
+                </div>
+            `).join('');
+        }
+
+        function addToHistory(expr, res) {
+            history.unshift({ expr, res });
+            if (history.length > 20) history.pop();
+            localStorage.setItem('calc_history', JSON.stringify(history));
+            renderHistory();
+        }
+
+        function clearHistory() {
+            history = [];
+            localStorage.removeItem('calc_history');
+            renderHistory();
+        }
+
+        // Init history on load
+        renderHistory();
 
         function showError(msg) {
             errorToast.innerText = msg;
@@ -292,16 +535,27 @@
 
             const a = previousInput;
             const b = currentInput;
+            const opSymbol = {
+                add: '+', subtract: '-', multiply: '×', divide: '/', modulo: '%', power: '^'
+            }[operator];
 
             try {
                 const response = await fetch(`/${operator}?a=${a}&b=${b}`);
                 const data = await response.json();
 
                 if (response.ok) {
-                    currentInput = data.result.toString();
+                    const result = data.result.toString();
+                    lastFullExpression = `${a} ${opSymbol} ${b} =`;
+                    
+                    addToHistory(`${a} ${opSymbol} ${b}`, result);
+                    
+                    currentInput = result;
+                    isResultDisplayed = true;
+                    updateDisplay();
+                    
+                    // Reset arithmetic state for fresh input
                     operator = null;
                     previousInput = '';
-                    updateDisplay();
                 } else {
                     showError(data.error || 'Something went wrong');
                     clearDisplay();
