@@ -29,4 +29,4 @@ jobs:
 
     - name: Run static code analysis
       run: |
-        python -m flake8 . || true
+        python -m flake8 . || echo "Linting completed with warnings"
